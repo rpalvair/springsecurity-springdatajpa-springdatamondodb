@@ -8,18 +8,14 @@ import org.springframework.security.core.context.SecurityContextHolder;
 /**
  * Created by widdy on 20/12/2015.
  */
-class SpringSecurityAuditorAware implements AuditorAware<User> {
+public class SpringSecurityAuditorAware implements AuditorAware<User> {
 
     public User getCurrentAuditor() {
 
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-
-        System.out.println("authentication = "+authentication);
-
         if (authentication == null || !authentication.isAuthenticated()) {
             return null;
         }
-
         return ((User) authentication.getPrincipal());
     }
 }

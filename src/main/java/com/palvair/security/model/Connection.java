@@ -1,14 +1,12 @@
 package com.palvair.security.model;
 
 import lombok.Data;
-import org.joda.time.DateTime;
 import org.springframework.data.annotation.CreatedBy;
 import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Table;
+import javax.persistence.*;
+import java.util.Date;
 
 /**
  * Created by widdy on 20/12/2015.
@@ -16,17 +14,19 @@ import javax.persistence.Table;
 @Table
 @Entity
 @Data
+@EntityListeners(AuditingEntityListener.class)
 public class Connection {
 
     @javax.persistence.Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
     private Long Id;
 
-    private String zipCode;
-
+    @Column
     @CreatedBy
     private User user;
 
+    @Column
     @CreatedDate
-    private DateTime createdDate;
+    private Date createdDate;
+
 }
