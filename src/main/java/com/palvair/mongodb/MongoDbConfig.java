@@ -12,8 +12,6 @@ import org.springframework.data.mongodb.repository.config.EnableMongoRepositorie
  * Created by widdy on 20/12/2015.
  */
 @Configuration
-//@EnableMongoRepositories("fr.palvair.ruddy.mongo.repository")
-//@ComponentScan("fr.palvair.ruddy.mongo.model")
 public class MongoDbConfig extends AbstractMongoConfiguration {
     @Override
     protected String getDatabaseName() {

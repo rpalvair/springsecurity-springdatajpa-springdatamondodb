@@ -3,6 +3,8 @@ package com.palvair.security.token;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.palvair.security.model.User;
+import lombok.extern.java.Log;
+import lombok.extern.log4j.Log4j;
 
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
@@ -12,10 +14,12 @@ import java.io.IOException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
+import java.util.Date;
 
 /**
  * Created by widdy on 20/12/2015.
  */
+@Log4j
 public class TokenHandler {
 
     private static final String HMAC_ALGO = "HmacSHA256";
@@ -43,13 +47,13 @@ public class TokenHandler {
                 boolean validHash = Arrays.equals(createHmac(userBytes), hash);
                 if (validHash) {
                     final User user = fromJSON(userBytes);
-                    /*if (new Date().getTime() < user.getExpires()) {
+                    if (new Date().getTime() < user.getExpires()) {
                         return user;
-                    }*/
-                    return user;
+                    }
                 }
             } catch (IllegalArgumentException e) {
-                //log tempering attempt here
+                log.error(e);
+                throw e;
             }
         }
         return null;

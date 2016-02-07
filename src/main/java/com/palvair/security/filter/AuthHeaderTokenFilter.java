@@ -2,7 +2,7 @@ package com.palvair.security.filter;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.palvair.jpa.ConnectionRepository;
-import com.palvair.security.UserDetailsService;
+
 
 import com.palvair.security.model.Connection;
 import com.palvair.security.model.User;
@@ -14,6 +14,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.web.authentication.AbstractAuthenticationProcessingFilter;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
@@ -46,7 +47,7 @@ public class AuthHeaderTokenFilter extends AbstractAuthenticationProcessingFilte
             throws AuthenticationException, IOException, ServletException {
 
         final User user = new ObjectMapper().readValue(request.getInputStream(), User.class);
-        final UsernamePasswordAuthenticationToken loginToken = new UsernamePasswordAuthenticationToken(
+        final Authentication loginToken = new UsernamePasswordAuthenticationToken(
                 user.getUsername(), user.getPassword());
         return getAuthenticationManager().authenticate(loginToken);
     }
@@ -54,12 +55,11 @@ public class AuthHeaderTokenFilter extends AbstractAuthenticationProcessingFilte
     @Override
     protected void successfulAuthentication(HttpServletRequest request, HttpServletResponse response,
                                             FilterChain chain, Authentication authentication) throws IOException, ServletException {
-        System.out.println("success");
         // Lookup the complete User object from the database and create an Authentication for it
-        final User authenticatedUser = userDetailsService.loadUserByUsername(authentication.getName());
+        final User authenticatedUser = (User)userDetailsService.loadUserByUsername(authentication.getName());
         System.out.println("authenticatedUser = " + authenticatedUser);
-        //final User authenticatedUser = new User(authentication.getName());
-        final UserAuthentication userAuthentication = new UserAuthentication(authenticatedUser);
+
+        final Authentication userAuthentication = new UserAuthentication(authenticatedUser);
 
         // Add the custom token as HTTP header to the response
         tokenAuthenticationService.addAuthentication(response, userAuthentication);

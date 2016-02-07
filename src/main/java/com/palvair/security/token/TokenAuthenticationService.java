@@ -27,15 +27,13 @@ public class TokenAuthenticationService {
         tokenHandler = new TokenHandler(DatatypeConverter.parseBase64Binary(secret));
     }
 
-    public void addAuthentication(HttpServletResponse response, UserAuthentication authentication) {
-        final User user = authentication.getDetails();
-        //user.setExpires(System.currentTimeMillis() + TEN_DAYS);
-        System.out.println("add header");
+    public void addAuthentication(HttpServletResponse response, Authentication authentication) {
+        final User user = (User)authentication.getDetails();
+        user.setExpires(System.currentTimeMillis() + TEN_DAYS);
         response.addHeader(AUTH_HEADER_NAME, tokenHandler.createTokenForUser(user));
     }
 
     public Authentication getAuthentication(HttpServletRequest request) {
-        System.out.println("getAuthentication");
         final String token = request.getHeader(AUTH_HEADER_NAME);
         System.out.println("token = "+token);
         if (token != null) {
