@@ -11,7 +11,7 @@ import javax.validation.constraints.NotNull;
  */
 @Entity
 @IdClass(UserAuthority.class)
-public class UserAuthority  implements GrantedAuthority{
+public class UserAuthority implements GrantedAuthority {
     @NotNull
     @ManyToOne(fetch = FetchType.LAZY)
     @JsonIgnore

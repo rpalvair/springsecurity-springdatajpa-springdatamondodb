@@ -1,17 +1,19 @@
 package com.palvair;
 
 
-import com.palvair.jpa.ConnectionRepository;
-import com.palvair.security.model.Connection;
+import com.palvair.jpa.UserRepository;
 import com.palvair.security.model.User;
+import com.palvair.security.model.UserRole;
+import org.junit.After;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.SpringApplicationConfiguration;
 import org.springframework.boot.test.WebIntegrationTest;
-import org.springframework.context.annotation.Import;
 import org.springframework.http.*;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.web.client.RestTemplate;
 
@@ -19,12 +21,14 @@ import org.springframework.web.client.RestTemplate;
  * Created by widdy on 20/12/2015.
  */
 @RunWith(SpringJUnit4ClassRunner.class)
-@Import(InserterConfig.class)
 @SpringApplicationConfiguration(ApplicationConfig.class)
 @WebIntegrationTest
 public class ApplicationIT {
 
     private RestTemplate restTemplate = new RestTemplate();
+
+    @Autowired
+    private UserRepository userRepository;
 
     @Test
     public void testToken() {
@@ -57,4 +61,26 @@ public class ApplicationIT {
         httpHeaders.add("X-AUTH-TOKEN", results.getHeaders().getFirst("X-AUTH-TOKEN"));
         return httpHeaders;
     }
+
+    @Before
+    public void before() {
+        userRepository.deleteAll();
+        addUser("admin", "admin");
+        addUser("user", "user");
+    }
+
+    @After
+    public void after() {
+        userRepository.deleteAll();
+    }
+
+    private void addUser(String username, String password) {
+        User user = new User();
+        user.setUsername(username);
+        user.setPassword(new BCryptPasswordEncoder().encode(password));
+        user.grantRole(username.equals("admin") ? UserRole.ADMIN : UserRole.USER);
+        System.out.println("save user = " + user);
+        userRepository.save(user);
+    }
+
 }

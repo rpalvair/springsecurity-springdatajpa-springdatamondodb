@@ -3,7 +3,6 @@ package com.palvair.security.token;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.palvair.security.model.User;
-import lombok.extern.java.Log;
 import lombok.extern.log4j.Log4j;
 
 import javax.crypto.Mac;

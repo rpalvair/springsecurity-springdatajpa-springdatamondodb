@@ -6,7 +6,6 @@ import com.palvair.security.model.UserRole;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.filter.CharacterEncodingFilter;
 
@@ -15,7 +14,6 @@ import javax.servlet.Filter;
 /**
  * Created by widdy on 20/12/2015.
  */
-@Configuration
 public class InserterConfig {
 
     @Bean

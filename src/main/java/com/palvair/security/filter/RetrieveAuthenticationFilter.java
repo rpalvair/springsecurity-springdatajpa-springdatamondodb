@@ -25,9 +25,9 @@ public class RetrieveAuthenticationFilter extends GenericFilterBean {
     @Override
     public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain filterChain) throws IOException, ServletException {
 
-            System.out.println("do filter");
-            SecurityContextHolder.getContext().setAuthentication(
-                    tokenAuthenticationService.getAuthentication((HttpServletRequest) servletRequest));
-            filterChain.doFilter(servletRequest, servletResponse); // always continue
+        System.out.println("do filter");
+        SecurityContextHolder.getContext().setAuthentication(
+                tokenAuthenticationService.getAuthentication((HttpServletRequest) servletRequest));
+        filterChain.doFilter(servletRequest, servletResponse); // always continue
     }
 }

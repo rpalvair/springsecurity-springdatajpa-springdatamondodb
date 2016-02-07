@@ -2,8 +2,8 @@ package com.palvair.security.config;
 
 import com.palvair.jpa.ConnectionRepository;
 import com.palvair.security.UserDetailsService;
-import com.palvair.security.filter.RetrieveAuthenticationFilter;
 import com.palvair.security.filter.AuthHeaderTokenFilter;
+import com.palvair.security.filter.RetrieveAuthenticationFilter;
 import com.palvair.security.token.TokenAuthenticationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -43,13 +43,13 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http
-				/*.exceptionHandling().and()
+                /*.exceptionHandling().and()
 				.anonymous().and()
 				.servletApi().and()
 				.headers().cacheControl().and()*/
                 .authorizeRequests()
 
-                        //allow anonymous resource requests
+                //allow anonymous resource requests
                 .antMatchers("/").permitAll()
                 .antMatchers("/favicon.ico").permitAll()
                 .antMatchers("/resources/**").permitAll()
@@ -69,7 +69,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 // custom JSON based authentication by POST of {"username":"<name>","password":"<password>"} which sets the token header upon authentication
                 .addFilterBefore(new AuthHeaderTokenFilter("/api/login", tokenAuthenticationService, userDetailsService, authenticationManager(), connectionRepository), UsernamePasswordAuthenticationFilter.class)
 
-                        // custom Token based authentication based on the header previously given to the client
+                // custom Token based authentication based on the header previously given to the client
                 .addFilterBefore(new RetrieveAuthenticationFilter(tokenAuthenticationService), UsernamePasswordAuthenticationFilter.class)/*.exceptionHandling().and()
 				.anonymous().and()
 				.servletApi().and()

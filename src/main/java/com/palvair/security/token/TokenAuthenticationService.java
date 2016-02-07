@@ -28,14 +28,14 @@ public class TokenAuthenticationService {
     }
 
     public void addAuthentication(HttpServletResponse response, Authentication authentication) {
-        final User user = (User)authentication.getDetails();
+        final User user = (User) authentication.getDetails();
         user.setExpires(System.currentTimeMillis() + TEN_DAYS);
         response.addHeader(AUTH_HEADER_NAME, tokenHandler.createTokenForUser(user));
     }
 
     public Authentication getAuthentication(HttpServletRequest request) {
         final String token = request.getHeader(AUTH_HEADER_NAME);
-        System.out.println("token = "+token);
+        System.out.println("token = " + token);
         if (token != null) {
             final User user = tokenHandler.parseUserFromToken(token);
             if (user != null) {

@@ -2,13 +2,10 @@ package com.palvair.security.filter;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.palvair.jpa.ConnectionRepository;
-
-
 import com.palvair.security.model.Connection;
 import com.palvair.security.model.User;
 import com.palvair.security.model.UserAuthentication;
 import com.palvair.security.token.TokenAuthenticationService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -56,7 +53,7 @@ public class AuthHeaderTokenFilter extends AbstractAuthenticationProcessingFilte
     protected void successfulAuthentication(HttpServletRequest request, HttpServletResponse response,
                                             FilterChain chain, Authentication authentication) throws IOException, ServletException {
         // Lookup the complete User object from the database and create an Authentication for it
-        final User authenticatedUser = (User)userDetailsService.loadUserByUsername(authentication.getName());
+        final User authenticatedUser = (User) userDetailsService.loadUserByUsername(authentication.getName());
         System.out.println("authenticatedUser = " + authenticatedUser);
 
         final Authentication userAuthentication = new UserAuthentication(authenticatedUser);
@@ -66,7 +63,7 @@ public class AuthHeaderTokenFilter extends AbstractAuthenticationProcessingFilte
 
         Connection connection = new Connection();
         Connection savedConnection = connectionRepository.saveAndFlush(connection);
-        System.out.println("savedConnection = "+savedConnection);
+        System.out.println("savedConnection = " + savedConnection);
 
         // Add the authentication to the Security context
         SecurityContextHolder.getContext().setAuthentication(userAuthentication);
