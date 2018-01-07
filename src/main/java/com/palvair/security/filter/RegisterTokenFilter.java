@@ -21,17 +21,17 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
-/**
- * Created by widdy on 20/12/2015.
- */
-public class AuthHeaderTokenFilter extends AbstractAuthenticationProcessingFilter {
+public class RegisterTokenFilter extends AbstractAuthenticationProcessingFilter {
 
-    private ConnectionRepository connectionRepository;
+    private final ConnectionRepository connectionRepository;
     private final TokenAuthenticationService tokenAuthenticationService;
     private final UserDetailsService userDetailsService;
 
-    public AuthHeaderTokenFilter(String urlMapping, TokenAuthenticationService tokenAuthenticationService,
-                                 UserDetailsService userDetailsService, AuthenticationManager authManager, ConnectionRepository connectionRepository) {
+    public RegisterTokenFilter(final String urlMapping,
+                               final TokenAuthenticationService tokenAuthenticationService,
+                               final UserDetailsService userDetailsService,
+                               final AuthenticationManager authManager,
+                               final ConnectionRepository connectionRepository) {
         super(new AntPathRequestMatcher(urlMapping));
         this.userDetailsService = userDetailsService;
         this.tokenAuthenticationService = tokenAuthenticationService;
@@ -44,8 +44,7 @@ public class AuthHeaderTokenFilter extends AbstractAuthenticationProcessingFilte
             throws AuthenticationException, IOException, ServletException {
 
         final User user = new ObjectMapper().readValue(request.getInputStream(), User.class);
-        final Authentication loginToken = new UsernamePasswordAuthenticationToken(
-                user.getUsername(), user.getPassword());
+        final Authentication loginToken = new UsernamePasswordAuthenticationToken(user.getUsername(), user.getPassword());
         return getAuthenticationManager().authenticate(loginToken);
     }
 
@@ -61,7 +60,7 @@ public class AuthHeaderTokenFilter extends AbstractAuthenticationProcessingFilte
         // Add the custom token as HTTP header to the response
         tokenAuthenticationService.addAuthentication(response, userAuthentication);
 
-        Connection connection = new Connection();
+        final Connection connection = new Connection();
         Connection savedConnection = connectionRepository.saveAndFlush(connection);
         System.out.println("savedConnection = " + savedConnection);
 

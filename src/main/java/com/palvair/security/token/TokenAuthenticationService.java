@@ -3,17 +3,12 @@ package com.palvair.security.token;
 import com.palvair.security.model.User;
 import com.palvair.security.model.UserAuthentication;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.xml.bind.DatatypeConverter;
 
-/**
- * Created by widdy on 20/12/2015.
- */
 @Service
 public class TokenAuthenticationService {
 
@@ -23,8 +18,8 @@ public class TokenAuthenticationService {
     private final TokenHandler tokenHandler;
 
     @Autowired
-    public TokenAuthenticationService(@Value("${token.secret}") String secret) {
-        tokenHandler = new TokenHandler(DatatypeConverter.parseBase64Binary(secret));
+    public TokenAuthenticationService(final TokenHandler tokenHandler) {
+        this.tokenHandler = tokenHandler;
     }
 
     public void addAuthentication(HttpServletResponse response, Authentication authentication) {

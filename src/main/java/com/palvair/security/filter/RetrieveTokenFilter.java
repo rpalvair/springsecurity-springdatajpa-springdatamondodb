@@ -1,6 +1,7 @@
 package com.palvair.security.filter;
 
 import com.palvair.security.token.TokenAuthenticationService;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.filter.GenericFilterBean;
 
@@ -11,23 +12,18 @@ import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 
-/**
- * Created by widdy on 20/12/2015.
- */
-public class RetrieveAuthenticationFilter extends GenericFilterBean {
+public class RetrieveTokenFilter extends GenericFilterBean {
 
     private final TokenAuthenticationService tokenAuthenticationService;
 
-    public RetrieveAuthenticationFilter(TokenAuthenticationService taService) {
+    public RetrieveTokenFilter(TokenAuthenticationService taService) {
         this.tokenAuthenticationService = taService;
     }
 
     @Override
     public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain filterChain) throws IOException, ServletException {
-
-        System.out.println("do filter");
-        SecurityContextHolder.getContext().setAuthentication(
-                tokenAuthenticationService.getAuthentication((HttpServletRequest) servletRequest));
+        final Authentication authentication = tokenAuthenticationService.getAuthentication((HttpServletRequest) servletRequest);
+        SecurityContextHolder.getContext().setAuthentication(authentication);
         filterChain.doFilter(servletRequest, servletResponse); // always continue
     }
 }

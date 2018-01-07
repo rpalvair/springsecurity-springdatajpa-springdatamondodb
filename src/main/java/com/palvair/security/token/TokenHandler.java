@@ -1,51 +1,46 @@
 package com.palvair.security.token;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.palvair.domain.UserService;
+import com.palvair.security.encryption.HmacEncrypter;
 import com.palvair.security.model.User;
 import lombok.extern.log4j.Log4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
-import javax.crypto.Mac;
-import javax.crypto.spec.SecretKeySpec;
-import javax.xml.bind.DatatypeConverter;
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.security.InvalidKeyException;
-import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
 import java.util.Date;
 
-/**
- * Created by widdy on 20/12/2015.
- */
+import static com.palvair.tools.Base64Utils.fromBase64;
+import static com.palvair.tools.Base64Utils.toBase64;
+
+
 @Log4j
+@Component
 public class TokenHandler {
 
-    private static final String HMAC_ALGO = "HmacSHA256";
     private static final String SEPARATOR = ".";
     private static final String SEPARATOR_SPLITTER = "\\.";
 
-    private final Mac hmac;
+    private final UserService userService;
+    private final HmacEncrypter hmacEncrypter;
 
-    public TokenHandler(byte[] secretKey) {
-        try {
-            hmac = Mac.getInstance(HMAC_ALGO);
-            hmac.init(new SecretKeySpec(secretKey, HMAC_ALGO));
-        } catch (NoSuchAlgorithmException | InvalidKeyException e) {
-            throw new IllegalStateException("failed to initialize HMAC: " + e.getMessage(), e);
-        }
+    @Autowired
+    public TokenHandler(final UserService userService,
+                        final HmacEncrypter hmacEncrypter) {
+        this.userService = userService;
+        this.hmacEncrypter = hmacEncrypter;
     }
 
-    public User parseUserFromToken(String token) {
+    public User parseUserFromToken(final String token) {
         final String[] parts = token.split(SEPARATOR_SPLITTER);
         if (parts.length == 2 && parts[0].length() > 0 && parts[1].length() > 0) {
             try {
                 final byte[] userBytes = fromBase64(parts[0]);
                 final byte[] hash = fromBase64(parts[1]);
 
-                boolean validHash = Arrays.equals(createHmac(userBytes), hash);
+                boolean validHash = Arrays.equals(hmacEncrypter.createHmac(userBytes), hash);
                 if (validHash) {
-                    final User user = fromJSON(userBytes);
+                    final User user = userService.fromJSON(userBytes);
                     if (new Date().getTime() < user.getExpires()) {
                         return user;
                     }
@@ -59,42 +54,10 @@ public class TokenHandler {
     }
 
     public String createTokenForUser(User user) {
-        byte[] userBytes = toJSON(user);
-        byte[] hash = createHmac(userBytes);
-        final StringBuilder sb = new StringBuilder(170);
-        sb.append(toBase64(userBytes));
-        sb.append(SEPARATOR);
-        sb.append(toBase64(hash));
-        return sb.toString();
+        byte[] userBytes = userService.toJSON(user);
+        byte[] hash = hmacEncrypter.createHmac(userBytes);
+        return toBase64(userBytes) + SEPARATOR + toBase64(hash);
     }
 
-    private User fromJSON(final byte[] userBytes) {
-        try {
-            return new ObjectMapper().readValue(new ByteArrayInputStream(userBytes), User.class);
-        } catch (IOException e) {
-            throw new IllegalStateException(e);
-        }
-    }
-
-    private byte[] toJSON(User user) {
-        try {
-            return new ObjectMapper().writeValueAsBytes(user);
-        } catch (JsonProcessingException e) {
-            throw new IllegalStateException(e);
-        }
-    }
-
-    private String toBase64(byte[] content) {
-        return DatatypeConverter.printBase64Binary(content);
-    }
-
-    private byte[] fromBase64(String content) {
-        return DatatypeConverter.parseBase64Binary(content);
-    }
-
-    // synchronized to guard internal hmac object
-    private synchronized byte[] createHmac(byte[] content) {
-        return hmac.doFinal(content);
-    }
 
 }
